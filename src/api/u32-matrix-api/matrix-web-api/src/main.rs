@@ -4,9 +4,15 @@ use actix_web::{web, App, HttpServer};
 use actix_web::client::Client;
 use matrix_web_api::controller;
 use matrix_http_client::{ApiUriBuilder, MatrixClient, ClientConfig};
+use matrix_web_security::Secret;
+use std::fs;
+use matrix_web_api::constants::MatrixWebApi;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+
+    let secret = Secret::default();
+    fs::write( MatrixWebApi::SECRET_FILE_NAME, secret.as_str());
 
     let server = HttpServer::new(|| {
         let client_config = ClientConfig::try_from(Path::new(".client.json"))
