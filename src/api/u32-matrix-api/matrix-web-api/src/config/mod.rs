@@ -5,7 +5,7 @@ use serde::de::DeserializeOwned;
 use std::fs::File;
 use std::io::BufReader;
 use uuid::Uuid;
-
+// TODO: Convert this tuple to a constant struct
 pub const REDIRECT_URI: (&'static str, &str, &str) = ("REDIRECT_URI", "redirect-uri", "r");
 fn redirect_arg() -> Arg<'static, 'static> {
     Arg::with_name(REDIRECT_URI.0)
@@ -14,7 +14,7 @@ fn redirect_arg() -> Arg<'static, 'static> {
         .required(true)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
 pub const SYNAPSE_URI: (&'static str, &str) = ("SYNAPSE_URI", "synapse-uri");
 fn synapse_arg() -> Arg<'static, 'static> {
     Arg::with_name(SYNAPSE_URI.0)
@@ -22,7 +22,7 @@ fn synapse_arg() -> Arg<'static, 'static> {
         .required(true)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
 pub const IP: (&'static str, &str, &str) = ("IP", "ip", "127.0.0.1");
 fn ip_arg() -> Arg<'static, 'static> {
     Arg::with_name(IP.0)
@@ -30,7 +30,7 @@ fn ip_arg() -> Arg<'static, 'static> {
         .default_value(IP.2)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
 pub const PORT: (&'static str, &str, &str, &str) = ("PORT", "port", "p", "7676");
 fn port_arg() -> Arg<'static, 'static> {
     Arg::with_name(PORT.0)
@@ -39,27 +39,25 @@ fn port_arg() -> Arg<'static, 'static> {
         .default_value(PORT.3)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
+pub const SECRET_KEY: (&'static str, &str, &str, &str) = ("SECRET_KEY", "secret-key", "-k", "invitation");
 /// The correct query name of the query string
-pub const SECRET_KEY: (&'static str, &str, &str, &str) =
-    ("SECRET_KEY", "secret-key", "-k", "invitation");
 fn secret_key_arg() -> Arg<'static, 'static> {
     Arg::with_name(SECRET_KEY.0)
         .long(SECRET_KEY.1)
         .short(SECRET_KEY.2)
         .default_value(SECRET_KEY.3)
 }
-
+// TODO: Convert this tuple to a constant struct
 /// SECRET has a default value that is loaded from a non-static lifetime
 pub const SECRET: (&'static str, &str) = ("SECRET", "secret");
-
 fn secret_arg<'a, 'b>(secret: &'a str) -> Arg<'a, 'b> {
     Arg::with_name(SECRET.0)
         .long(SECRET.1)
         .default_value(secret)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
 /// path the user must navigate to in order to create an acc
 pub const BASE_URI: (&'static str, &str, &str) = ("base_uri", "uri-path", "/register");
 fn base_uri_arg() -> Arg<'static, 'static> {
@@ -68,7 +66,7 @@ fn base_uri_arg() -> Arg<'static, 'static> {
         .default_value(BASE_URI.2)
         .takes_value(true)
 }
-
+// TODO: Convert this tuple to a constant struct
 pub const STATIC_PATH: (&'static str, &str, &str) = ("STATIC", "static", "/static");
 fn static_path_arg() -> Arg<'static, 'static> {
     Arg::with_name(STATIC_PATH.0)
