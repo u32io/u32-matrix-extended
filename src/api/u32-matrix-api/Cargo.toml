@@ -7,5 +7,6 @@ members = [
     "matrix-web-entity",
     "matrix-web-dao",
     "matrix-web-service",
+    "matrix-web-security",
     "matrix-web-api",
 ]

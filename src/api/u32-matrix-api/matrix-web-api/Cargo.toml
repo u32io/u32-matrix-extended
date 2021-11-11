@@ -8,9 +8,12 @@ edition = "2018"
 
 [dependencies]
 matrix-http-client = { path = "../matrix-http-client" }
+matrix-web-security = { path = "../matrix-web-security" }
 actix-web = { version = "3", features = ["openssl"] }
 actix-rt = "1"
+clap = "2"
 serde = "1"
 serde_json = "1"
 openssl = "*"
 urlencoding = "2.1.0"
+uuid = { version = "0.8", features = [ "serde", "v4" ] }

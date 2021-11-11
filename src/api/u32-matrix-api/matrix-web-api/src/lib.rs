@@ -3,3 +3,4 @@ mod service;
 mod model;
 
 pub mod controller;
+mod config;
