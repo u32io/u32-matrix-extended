@@ -3,5 +3,5 @@ mod service;
 mod model;
 
 pub mod controller;
-mod config;
+mod settings;
 pub mod constants;

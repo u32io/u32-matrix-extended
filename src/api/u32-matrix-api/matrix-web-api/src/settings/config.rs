@@ -5,6 +5,8 @@ use serde::de::DeserializeOwned;
 use std::fs::File;
 use std::io::BufReader;
 use uuid::Uuid;
+use super::environment::EnvironmentName;
+
 // TODO: Convert this tuple to a constant struct
 pub const REDIRECT_URI: (&'static str, &str, &str) = ("REDIRECT_URI", "redirect-uri", "r");
 fn redirect_arg() -> Arg<'static, 'static> {
@@ -74,7 +76,7 @@ fn static_path_arg() -> Arg<'static, 'static> {
         .default_value(STATIC_PATH.2)
         .takes_value(true)
 }
-
+// TODO: move all these values to /constants
 pub const APP_NAME: &'static str = "u32 Private Register for Synapse";
 pub const APP_VERSION: &'static str = "0.0.1";
 pub const APP_AUTHOR: &'static str = "James M. <jamesjmeyer210@gmail.com>";
@@ -104,6 +106,7 @@ pub struct Config {
     pub redirect: Uri,
     pub synapse: Uri,
     pub static_path: String,
+    environment: EnvironmentName,
 }
 
 impl Default for Config {
@@ -117,6 +120,7 @@ impl Default for Config {
             redirect: Uri::from_static(DEFAULT_ADDRESS),
             synapse: Uri::from_static(DEFAULT_ADDRESS),
             static_path: STATIC_PATH.2.to_string(),
+            environment: EnvironmentName::new(),
         }
     }
 }
@@ -128,5 +132,9 @@ impl Config {
     {
         f(&mut self);
         self
+    }
+
+    pub fn get_environment(&self) -> &EnvironmentName {
+        &self.environment
     }
 }
