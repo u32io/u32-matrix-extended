@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::convert::TryFrom;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ClientConfig {
     pub home_server: String,
     pub authority: String, // TODO: impl Deserialize for Uri

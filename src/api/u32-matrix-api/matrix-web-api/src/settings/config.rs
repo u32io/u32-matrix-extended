@@ -7,6 +7,7 @@ use std::io::BufReader;
 use uuid::Uuid;
 use super::environment::EnvironmentName;
 use crate::constants::MatrixWebApi;
+use matrix_http_client::ClientConfig;
 
 // TODO: Move ConstArg to a utility crate
 pub struct ConstArg {
@@ -110,35 +111,42 @@ impl ConfigConstants {
 }
 
 #[derive(Debug, Clone)]
-pub struct Config {
+pub struct ServerConfig {
     pub ip: String,
     pub port: String,
+    pub static_path: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct Config {
     pub secret_key: String,
     pub secret: Secret,
     pub base_uri: String,
     pub redirect: Uri,
     pub synapse: Uri,
-    pub static_path: String,
-    pub home_server: String,
-    pub authority: String,
-    pub client_api: String,
+    pub server: ServerConfig,
+    pub client: ClientConfig,
     environment: EnvironmentName,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
-            ip: ConfigConstants::IP.get_value().to_string(),
-            port: ConfigConstants::PORT.get_value().to_string(),
             secret_key: ConfigConstants::SECRET_KEY.get_value().to_string(),
             secret: Secret::default(),
             base_uri: ConfigConstants::BASE_URI.get_value().to_string(),
             redirect: Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS),
             synapse: Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS),
-            static_path: ConfigConstants::STATIC_PATH.get_value().to_string(),
-            home_server: ConfigConstants::HOME_SERVER.get_value().to_string(),
-            authority: ConfigConstants::AUTHORITY.get_value().to_string(),
-            client_api: ConfigConstants::CLIENT_API.get_value().to_string(),
+            server: ServerConfig {
+                ip: ConfigConstants::IP.get_value().to_string(),
+                port: ConfigConstants::PORT.get_value().to_string(),
+                static_path: ConfigConstants::STATIC_PATH.get_value().to_string(),
+            },
+            client: ClientConfig {
+                home_server: ConfigConstants::HOME_SERVER.get_value().to_string(),
+                authority: ConfigConstants::AUTHORITY.get_value().to_string(),
+                client_api: ConfigConstants::CLIENT_API.get_value().to_string(),
+            },
             environment: EnvironmentName::new(),
         }
     }

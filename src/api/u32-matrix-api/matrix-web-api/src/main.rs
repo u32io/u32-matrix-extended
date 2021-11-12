@@ -33,13 +33,20 @@ async fn main() -> std::io::Result<()> {
     let secret = Secret::default();
     fs::write( MatrixWebApi::SECRET_FILE_NAME, secret.as_str())?;
     info!("Generated a secret: {}", MatrixWebApi::SECRET_FILE_NAME);
-
+    // Create a command line interface and collect the arguments
     let cli =  Cli::new(&secret);
     let args = cli.get_matches();
-
+    // Map arguments to configuration values within the scope of `fn main`
     config = config.opts(|conf|{
-        args.value_of(ConfConsts::IP.name).map(|x|conf.ip = x.to_string());
-        args.value_of(ConfConsts::PORT.name).map(|x|conf.port = x.to_string());
+        // assign server options
+        args.value_of(ConfConsts::IP.name).map(|x|conf.server.ip = x.to_string());
+        args.value_of(ConfConsts::PORT.name).map(|x|conf.server.port = x.to_string());
+        args.value_of(ConfConsts::STATIC_PATH.name).map(|x|conf.server.static_path = x.to_string());
+        // assign client options
+        args.value_of(ConfConsts::HOME_SERVER.name).map(|x|conf.client.home_server = x.to_string());
+        args.value_of(ConfConsts::AUTHORITY.name).map(|x|conf.client.authority = x.to_string());
+        args.value_of(ConfConsts::CLIENT_API.name).map(|x|conf.client.client_api = x.to_string());
+
         args.value_of(ConfConsts::SECRET_KEY.name).map(|x|conf.secret_key = x.to_string());
         args.value_of(ConfConsts::SECRET.name).map(|x|conf.secret = Secret::from(x));
         args.value_of(ConfConsts::BASE_URI.name).map(|x|conf.base_uri = x.to_string());
@@ -48,27 +55,27 @@ async fn main() -> std::io::Result<()> {
                 .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)));
         args.value_of(ConfConsts::SYNAPSE_URI.name)
             .map(|x| conf.synapse = Uri::from_str(x)
-                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)))
-            .unwrap();
-        args.value_of(ConfConsts::STATIC_PATH.name).map(|x|conf.static_path = x.to_string());
+                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)));
     });
+    info!("Config: {:?}", config);
 
-    let server = HttpServer::new(|| {
-        let client_config = ClientConfig::try_from(Path::new(".client.json"))
-            .unwrap();
-        let api_uri_builder = ApiUriBuilder::new(client_config.authority.as_str(), client_config.client_api.as_str())
-            .unwrap();
+    let server_cfg = config.server.clone();
+
+    let server = HttpServer::new(move||{
+        let api_uri_builder = ApiUriBuilder::new(config.client.authority.as_str(), config.client.client_api.as_str())
+            .expect(&format!("Failed to construct an ApiUriBuilder"));
         let actix_client = Client::default();
 
         let matrix_client = MatrixClient::new(api_uri_builder, actix_client);
 
         App::new()
             .data(matrix_client)
-            .service(web::scope("/matrix/message/v1").configure(controller::v1::init_message_controller)
+            .service(web::scope("/matrix/message/v1")
+                .configure(controller::v1::init_message_controller)
         )
     });
 
-    server.bind(&format!("{}:{}", config.ip, config.port))?
+    server.bind(&format!("{}:{}", server_cfg.ip, server_cfg.port))?
         .run()
         .await
 }
