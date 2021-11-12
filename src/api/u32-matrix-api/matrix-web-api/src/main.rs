@@ -7,8 +7,11 @@ use matrix_http_client::{ApiUriBuilder, MatrixClient, ClientConfig};
 use matrix_web_security::Secret;
 use std::fs;
 use matrix_web_api::constants::MatrixWebApi;
-use matrix_web_api::settings::{Config, EnvironmentName};
+use matrix_web_api::settings::{Config, EnvironmentName, Cli, ConfConsts};
 use log::{info};
+use std::env::args;
+use actix_web::http::Uri;
+use std::str::FromStr;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -31,7 +34,27 @@ async fn main() -> std::io::Result<()> {
     fs::write( MatrixWebApi::SECRET_FILE_NAME, secret.as_str())?;
     info!("Generated a secret: {}", MatrixWebApi::SECRET_FILE_NAME);
 
-    //config.opts()
+    let cli =  Cli::new(&secret);
+    let args = cli.get_matches();
+
+    config.opts(|conf|{
+        conf.ip = args.value_of(ConfConsts::IP.name).unwrap().to_string();
+        conf.port = args.value_of(ConfConsts::PORT.name).unwrap().to_string();
+        conf.secret_key = args.value_of(ConfConsts::SECRET_KEY.name).unwrap().to_string();
+        conf.secret = args.value_of(ConfConsts::SECRET.name).map(|x| Secret::from(x)).unwrap();
+        conf.base_uri = args.value_of(ConfConsts::BASE_URI.name).unwrap().to_string();
+        conf.redirect = args
+            .value_of(ConfConsts::REDIRECT_URI.name)
+            .map(|x| Uri::from_str(x)
+                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)))
+            .unwrap();
+        conf.synapse = args
+            .value_of(ConfConsts::SYNAPSE_URI.name)
+            .map(|x| Uri::from_str(x)
+                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)))
+            .unwrap();
+        conf.static_path = args.value_of(ConfConsts::STATIC_PATH.name).unwrap().to_string();
+    });
 
     let server = HttpServer::new(|| {
         let client_config = ClientConfig::try_from(Path::new(".client.json"))
