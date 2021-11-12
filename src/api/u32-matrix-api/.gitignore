@@ -6,3 +6,4 @@ target/
 
 # matrix-web-*
 .*.json
+secret.dat
