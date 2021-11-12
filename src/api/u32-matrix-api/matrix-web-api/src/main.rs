@@ -37,24 +37,20 @@ async fn main() -> std::io::Result<()> {
     let cli =  Cli::new(&secret);
     let args = cli.get_matches();
 
-    config.opts(|conf|{
-        //conf.ip = args.value_of(ConfConsts::IP.name).and_then(|x|conf.ip = x.to_string()) .unwrap().to_string();
+    config = config.opts(|conf|{
         args.value_of(ConfConsts::IP.name).map(|x|conf.ip = x.to_string());
-        conf.port = args.value_of(ConfConsts::PORT.name).unwrap().to_string();
-        conf.secret_key = args.value_of(ConfConsts::SECRET_KEY.name).unwrap().to_string();
-        conf.secret = args.value_of(ConfConsts::SECRET.name).map(|x| Secret::from(x)).unwrap();
-        conf.base_uri = args.value_of(ConfConsts::BASE_URI.name).unwrap().to_string();
-        conf.redirect = args
-            .value_of(ConfConsts::REDIRECT_URI.name)
-            .map(|x| Uri::from_str(x)
+        args.value_of(ConfConsts::PORT.name).map(|x|conf.port = x.to_string());
+        args.value_of(ConfConsts::SECRET_KEY.name).map(|x|conf.secret_key = x.to_string());
+        args.value_of(ConfConsts::SECRET.name).map(|x|conf.secret = Secret::from(x));
+        args.value_of(ConfConsts::BASE_URI.name).map(|x|conf.base_uri = x.to_string());
+        args.value_of(ConfConsts::REDIRECT_URI.name)
+            .map(|x| conf.redirect = Uri::from_str(x)
+                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)));
+        args.value_of(ConfConsts::SYNAPSE_URI.name)
+            .map(|x| conf.synapse = Uri::from_str(x)
                 .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)))
             .unwrap();
-        conf.synapse = args
-            .value_of(ConfConsts::SYNAPSE_URI.name)
-            .map(|x| Uri::from_str(x)
-                .unwrap_or(Uri::from_static(MatrixWebApi::DEFAULT_ADDRESS)))
-            .unwrap();
-        conf.static_path = args.value_of(ConfConsts::STATIC_PATH.name).unwrap().to_string();
+        args.value_of(ConfConsts::STATIC_PATH.name).map(|x|conf.static_path = x.to_string());
     });
 
     let server = HttpServer::new(|| {
@@ -72,5 +68,7 @@ async fn main() -> std::io::Result<()> {
         )
     });
 
-    server.bind("127.0.0.1:7676")?.run().await
+    server.bind(&format!("{}:{}", config.ip, config.port))?
+        .run()
+        .await
 }
