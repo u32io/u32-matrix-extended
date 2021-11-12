@@ -1,7 +1,7 @@
 // TODO: Move this file to its own external crate (we'll need this env standard for many other projects)
 use std::env;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum EnvironmentName {
     LOCAL,
     DEV,

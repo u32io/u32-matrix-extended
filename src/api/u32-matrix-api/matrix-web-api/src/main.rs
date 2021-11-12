@@ -7,9 +7,22 @@ use matrix_http_client::{ApiUriBuilder, MatrixClient, ClientConfig};
 use matrix_web_security::Secret;
 use std::fs;
 use matrix_web_api::constants::MatrixWebApi;
+use matrix_web_api::settings::{Config, EnvironmentName};
+use log::{info};
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+
+    let config = Config::default();
+    if *config.get_environment() == EnvironmentName::PROD {
+        log4rs::init_file(MatrixWebApi::LOGGING_PROD_FILE_NAME, Default::default())
+            .expect(&format!("Unable to locate {}", MatrixWebApi::LOGGING_PROD_FILE_NAME))
+    }
+    else {
+        log4rs::init_file(MatrixWebApi::LOGGING_FILE_NAME, Default::default())
+            .expect(&format!("Unable to locate {}", MatrixWebApi::LOGGING_FILE_NAME))
+    }
+    info!("Starting {} version {}", MatrixWebApi::APP_NAME, MatrixWebApi::APP_VERSION);
 
     let secret = Secret::default();
     fs::write( MatrixWebApi::SECRET_FILE_NAME, secret.as_str())?;
