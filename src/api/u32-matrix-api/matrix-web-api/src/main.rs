@@ -38,7 +38,8 @@ async fn main() -> std::io::Result<()> {
     let args = cli.get_matches();
 
     config.opts(|conf|{
-        conf.ip = args.value_of(ConfConsts::IP.name).unwrap().to_string();
+        //conf.ip = args.value_of(ConfConsts::IP.name).and_then(|x|conf.ip = x.to_string()) .unwrap().to_string();
+        args.value_of(ConfConsts::IP.name).map(|x|conf.ip = x.to_string());
         conf.port = args.value_of(ConfConsts::PORT.name).unwrap().to_string();
         conf.secret_key = args.value_of(ConfConsts::SECRET_KEY.name).unwrap().to_string();
         conf.secret = args.value_of(ConfConsts::SECRET.name).map(|x| Secret::from(x)).unwrap();
