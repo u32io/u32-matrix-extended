@@ -75,8 +75,10 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .data(matrix_client)
-            .service(web::scope("/matrix/message/v1")
-            .configure(controller::v1::init_message_controller)
+            .service(web::scope("/message/v1")
+                .configure(controller::v1::init_message_controller)
+            .service(web::scope("/register/v1"))
+                .configure(controller::v1::init_register_controller)
             .service(actix_files::Files::new("/static", config.server.static_path.as_str()))
         )
     });
