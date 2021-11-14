@@ -10,6 +10,7 @@ edition = "2018"
 # internal
 matrix-http-client = { path = "../matrix-http-client" }
 matrix-web-security = { path = "../matrix-web-security" }
+matrix-web-dto = { path = "../matrix-web-dto" }
 # external
 actix-web = { version = "3", features = ["openssl"] }
 actix-rt = "1"
