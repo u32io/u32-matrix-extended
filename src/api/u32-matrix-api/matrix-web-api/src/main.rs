@@ -15,9 +15,11 @@ use std::str::FromStr;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+
     // Create a default configuration on application startup. Most of the values in this config will
     // be overridden by the CLI input.
     let mut config = Config::default();
+
     // Instantiate a logger based on the environment.
     if *config.get_environment() == EnvironmentName::PROD {
         log4rs::init_file(MatrixWebApi::LOGGING_PROD_FILE_NAME, Default::default())
@@ -28,14 +30,17 @@ async fn main() -> std::io::Result<()> {
             .expect(&format!("Unable to locate {}", MatrixWebApi::LOGGING_FILE_NAME))
     }
     info!("Starting {} version {}", MatrixWebApi::APP_NAME, MatrixWebApi::APP_VERSION);
+
     // Generate a new secret
     // TODO: In order to reach v1.0.0, we need to have bot which sends the secret to the chat
     let secret = Secret::default();
     fs::write( MatrixWebApi::SECRET_FILE_NAME, secret.as_str())?;
     info!("Generated a secret: {}", MatrixWebApi::SECRET_FILE_NAME);
+
     // Create a command line interface and collect the arguments
     let cli =  Cli::new(&secret);
     let args = cli.get_matches();
+
     // Map arguments to configuration values within the scope of `fn main`
     config = config.opts(|conf|{
         // assign server options
