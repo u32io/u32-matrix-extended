@@ -1,15 +1,12 @@
-use std::convert::TryFrom;
-use std::path::Path;
 use actix_web::{web, App, HttpServer};
 use actix_web::client::Client;
 use matrix_web_api::controller;
-use matrix_http_client::{ApiUriBuilder, MatrixClient, ClientConfig};
+use matrix_http_client::{ApiUriBuilder, MatrixClient};
 use matrix_web_security::Secret;
 use std::fs;
 use matrix_web_api::constants::MatrixWebApi;
 use matrix_web_api::settings::{Config, EnvironmentName, Cli, ConfConsts};
 use log::{info};
-use std::env::args;
 use actix_web::http::Uri;
 use std::str::FromStr;
 

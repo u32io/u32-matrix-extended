@@ -8,7 +8,7 @@ pub mod model;
 pub mod error;
 pub mod constants;
 
-pub use abstraction::TMatrixClient;
+pub use abstraction::AbsMatrixClient;
 pub use api_uri_builder::ApiUriBuilder;
 pub use client_config::ClientConfig;
 pub use matrix_client::MatrixClient;

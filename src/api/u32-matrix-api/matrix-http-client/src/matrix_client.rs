@@ -8,7 +8,7 @@ use actix_web::http::StatusCode;
 use urlencoding::Encoded;
 use std::future::Future;
 use std::pin::Pin;
-use crate::TMatrixClient;
+use crate::AbsMatrixClient;
 use crate::error::{MatrixClientError, HttpResponseError};
 
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
@@ -74,7 +74,7 @@ impl MatrixClient {
     }
 }
 
-impl TMatrixClient for MatrixClient {
+impl AbsMatrixClient for MatrixClient {
     /// `GET` the authentication scheme of the matrix-synapse API
     fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<FlowCollection,MatrixClientError>> + 'req>> {
         Box::pin(self.internal.get_login())

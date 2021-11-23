@@ -2,7 +2,7 @@ use actix_web::client::Client;
 use actix_web::http::StatusCode;
 use std::convert::TryFrom;
 use std::path::Path;
-use matrix_http_client::{MatrixClient, ApiUriBuilder, ClientConfig, TMatrixClient};
+use matrix_http_client::{MatrixClient, ApiUriBuilder, ClientConfig, AbsMatrixClient};
 use matrix_http_client::abstraction::GetError;
 use urlencoding::Encoded;
 

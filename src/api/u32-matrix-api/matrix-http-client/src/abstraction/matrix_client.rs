@@ -4,7 +4,7 @@ use crate::model::{FlowCollection, LoginRequest, LoginResponse, MessageRequest, 
 use crate::MatrixClientError;
 use urlencoding::Encoded;
 
-pub trait TMatrixClient {
+pub trait AbsMatrixClient {
     fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<FlowCollection,MatrixClientError>> + 'req>>;
 
     fn post_login<'req>(&'req self, req: &'req LoginRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>>;
