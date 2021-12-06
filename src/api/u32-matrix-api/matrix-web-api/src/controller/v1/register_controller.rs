@@ -6,7 +6,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(post_register);
 }
 
-#[post("/register")]
+#[post("/v1/register")]
 async fn post_register(dto: Json<RegisterDTO>) -> impl Responder {
     "ok"
 }
