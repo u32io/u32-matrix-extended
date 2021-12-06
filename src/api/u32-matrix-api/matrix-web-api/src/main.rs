@@ -70,8 +70,9 @@ async fn main() -> std::io::Result<()> {
 
         let matrix_client = MatrixClient::new(api_uri_builder, actix_client);
 
+
         App::new()
-            .data(matrix_client)
+            //.data(matrix_client)
             .service(web::scope("/message/v1")
                 .configure(controller::v1::init_message_controller)
             .service(web::scope("/register/v1"))

@@ -1,5 +1,3 @@
-use std::future::Future;
+mod abs_register_service;
 
-// trait TMessageService {
-//     fn send_message() -> dyn Future;
-// }
+pub use abs_register_service::AbsRegisterService as AbsRegisterService;

@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 # internal
 matrix-http-client = { path = "../matrix-http-client" }
+matrix-web-service = { path = "../matrix-web-service" }
 matrix-web-security = { path = "../matrix-web-security" }
 matrix-web-dto = { path = "../matrix-web-dto" }
 # external
