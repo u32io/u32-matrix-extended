@@ -6,9 +6,12 @@ use matrix_web_security::Secret;
 use std::fs;
 use matrix_web_api::constants::MatrixWebApi;
 use matrix_web_api::settings::{Config, EnvironmentName, Cli, ConfConsts};
+use matrix_web_service::traits::AbsRegisterService;
 use log::{info};
 use actix_web::http::Uri;
 use std::str::FromStr;
+use std::sync::Arc;
+use matrix_web_service::service::RegisterService;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -69,10 +72,12 @@ async fn main() -> std::io::Result<()> {
         let actix_client = Client::default();
 
         let matrix_client = MatrixClient::new(api_uri_builder, actix_client);
+        let matrix_client = Arc::new(matrix_client);
 
+        let register_service = Box::new(RegisterService::new(matrix_client)) as Box<dyn AbsRegisterService>;
 
         App::new()
-            //.data(matrix_client)
+            .data(register_service)
             .service(web::scope("/message/v1")
                 .configure(controller::v1::init_message_controller)
             .service(web::scope("/register/v1"))
