@@ -1,8 +1,8 @@
+use serde::{Deserialize, Serialize};
 use crate::constants::AuthenticationType;
 
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize)]
+// TODO: Rename `Flow` to something like `AuthenticationFlow`
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Flow {
     #[serde(rename = "type")]
     pub authentication_type: AuthenticationType,

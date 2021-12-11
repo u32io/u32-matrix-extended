@@ -5,6 +5,7 @@ use std::path::Path;
 use matrix_http_client::{MatrixClient, ApiUriBuilder, ClientConfig, AbsMatrixClient};
 use matrix_http_client::abstraction::GetError;
 use urlencoding::Encoded;
+use matrix_http_client::model::{RegisterRequest, Flow};
 
 fn init_matrix_client() -> MatrixClient {
     let config = ClientConfig::try_from(Path::new(".client.json")).unwrap();
@@ -87,4 +88,46 @@ async fn matrix_client_returns_200_after_valid_login_and_message_send(){
         .await;
 
     assert!(msg_req.is_ok());
+}
+
+#[actix_rt::test]
+async fn matrix_client_returns_200_on_successful_registration(){
+    use chrono::prelude::*;
+    use openssl::base64::encode_block;
+    use openssl::sha::sha1;
+
+    let matrix = init_matrix_client();
+
+    let flow = matrix.get_login()
+        .await
+        .expect("Failed to retrieve AuthenticationFlow collection")
+        .flows
+        .into_iter()
+        .next()
+        .expect("AuthenticationFlow collection is empty");
+
+    let utc_now = Utc::now().timestamp().to_string();
+
+    let registration = RegisterRequest {
+        username: format!("test_bot_{}", utc_now),
+        password: encode_block(&sha1(utc_now.as_bytes())),
+        auth: Flow {
+            authentication_type: flow.authentication_type
+        }
+    };
+
+    println!("{:?}", registration);
+
+    let resp = matrix.post_register(&registration).await;
+
+    if resp.is_err() {
+        println!("{:?}", resp.unwrap_err());
+    }
+    else {
+        assert!(resp.is_ok());
+        let resp = resp.unwrap();
+        assert!(!resp.access_token.is_empty());
+        assert!(!resp.home_server.is_empty());
+        assert!(resp.user_id.contains(&registration.username));
+    }
 }

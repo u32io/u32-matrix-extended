@@ -5,5 +5,6 @@ pub struct LoginResponse {
     pub user_id: String,
     pub access_token: String,
     pub home_server: String,
-    pub device_id: String,
+    #[serde(default)]
+    pub device_id: Option<String>,
 }

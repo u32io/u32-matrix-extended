@@ -10,6 +10,7 @@ use std::future::Future;
 use std::pin::Pin;
 use crate::AbsMatrixClient;
 use crate::error::{MatrixClientError, HttpResponseError};
+use crate::model::RegisterRequest;
 
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
 macro_rules! http_get {
@@ -98,6 +99,21 @@ impl AbsMatrixClient for MatrixClient {
     ) -> Pin<Box<dyn Future<Output=Result<EventResponse, MatrixClientError>> + 'req>> {
         Box::pin(self.internal.post_message(msg, room_id, access_token))
     }
+    /// `POST` a registration payload and expect a `200` response with an access token
+    /// ```bash
+    /// curl -XPOST \
+    ///     -d '{"username":"example", "password":"wordpass", "auth": {"type":"m.login.dummy"}}' \
+    ///     "https://localhost:8448/_matrix/client/r0/register"
+    ///
+    /// {
+    ///     "access_token": "QGV4YW1wbGU6bG9jYWxob3N0.AqdSzFmFYrLrTmteXc",
+    ///     "home_server": "localhost",
+    ///     "user_id": "@example:localhost"
+    /// }
+    /// ```
+    fn post_register<'req>(&'req self, req: &'req RegisterRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>> {
+        Box::pin(self.internal.post_register(req))
+    }
 }
 
 struct InternalMatrixClient {
@@ -136,5 +152,10 @@ impl InternalMatrixClient {
             msg
         )?;
         try_convert_200!(response, EventResponse)
+    }
+
+    async fn post_register<'req>(&'req self, req: &'req RegisterRequest) -> Result<LoginResponse, MatrixClientError> {
+        let mut response = http_post!(self.http_client, self.api_uri.register(), req)?;
+        try_convert_200!(response, LoginResponse)
     }
 }

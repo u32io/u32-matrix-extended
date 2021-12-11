@@ -8,6 +8,7 @@ pub use login_request::LoginIdentifier;
 pub use login_request::LoginRequest;
 pub use login_response::LoginResponse;
 pub use message_request::MessageRequest;
+pub use register_request::RegisterRequest;
 
 mod error_code;
 mod error_response;
@@ -16,6 +17,7 @@ mod flow;
 mod login_request;
 mod login_response;
 mod message_request;
+mod register_request;
 
 pub enum ErrorKind {
     InvalidScheme,

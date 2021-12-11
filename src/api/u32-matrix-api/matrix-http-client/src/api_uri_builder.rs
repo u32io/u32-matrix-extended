@@ -24,6 +24,11 @@ impl ApiUriBuilder {
         Uri::from_str(uri.as_str()).unwrap()
     }
 
+    pub fn register(&self) -> Uri {
+        let uri = format!("{}/register", self.base_uri.as_str());
+        Uri::from_str(uri.as_str()).unwrap()
+    }
+
     // "/_matrix/client/r0/rooms/{ROOM_ID}/send/{ROOM_EVENT}?access_token={ACCESS_TOKEN}"
     pub fn send(
         &self,
