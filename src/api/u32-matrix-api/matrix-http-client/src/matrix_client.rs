@@ -3,7 +3,7 @@ use super::model::{
     ErrorResponse, EventResponse, FlowCollection, LoginRequest, LoginResponse, MessageRequest,
 };
 use super::ApiUriBuilder;
-use actix_web::client::{Client};
+use actix_web::client::{Client, ClientResponse};
 use actix_web::http::StatusCode;
 use urlencoding::Encoded;
 use std::future::Future;
@@ -11,6 +11,7 @@ use std::pin::Pin;
 use crate::AbsMatrixClient;
 use crate::error::{MatrixClientError, HttpResponseError};
 use crate::model::RegisterRequest;
+use actix_web::dev::{PayloadStream, Payload};
 
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
 macro_rules! http_get {
@@ -155,7 +156,30 @@ impl InternalMatrixClient {
     }
 
     async fn post_register<'req>(&'req self, req: &'req RegisterRequest) -> Result<LoginResponse, MatrixClientError> {
-        let mut response = http_post!(self.http_client, self.api_uri.register(), req)?;
+        let mut response = http_post!(
+            self.http_client,
+            self.api_uri.register(),
+            req
+        )?;
         try_convert_200!(response, LoginResponse)
     }
+
+    /*
+    macro_rules! http_get {
+        ($http_client:expr, $uri:expr) => {
+            $http_client
+                .get($uri)
+                .send()
+                .await
+                .map_err(|e| MatrixClientError::SendRequestError(e))
+        };
+    }
+    */
+    // async fn send_get(&self, uri: &str) -> Result<ClientResponse<Decoder<Payload<PayloadStream>>>, MatrixClientError> {
+    //     self.http_client
+    //         .get(uri)
+    //         .send()
+    //         .map_err(|send_request_error|MatrixClientError::SendRequestError(e))
+    //         .await
+    // }
 }

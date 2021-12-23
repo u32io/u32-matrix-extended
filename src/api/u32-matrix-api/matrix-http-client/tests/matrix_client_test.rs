@@ -8,6 +8,11 @@ use urlencoding::Encoded;
 use matrix_http_client::model::{RegisterRequest, Flow};
 
 fn init_matrix_client() -> MatrixClient {
+    use std::{thread, time};
+    // We sleep the thread for 1 second in order to slow the integration tests down.
+    // This gives us more consistent results because the external API might be rate limited.
+    thread::sleep(time::Duration::from_secs(1));
+
     let config = ClientConfig::try_from(Path::new(".client.json")).unwrap();
     let api_uri_builder =
         ApiUriBuilder::new(config.authority.as_str(), config.client_api.as_str()).unwrap();
