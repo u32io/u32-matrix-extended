@@ -2,8 +2,8 @@ pub use error_code::ErrorCode;
 // Models
 pub use error_response::ErrorResponse;
 pub use event_response::EventResponse;
-pub use flow::Flow;
-pub use flow::FlowCollection;
+pub use flow::AuthFlow;
+pub use flow::AuthFlowCollection;
 pub use login_request::LoginIdentifier;
 pub use login_request::LoginRequest;
 pub use login_response::LoginResponse;

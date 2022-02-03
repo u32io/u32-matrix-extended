@@ -1,17 +1,17 @@
 use serde::{Serialize};
-use crate::model::Flow;
+use crate::model::AuthFlow;
 
 #[derive(Debug, Serialize)]
 pub struct RegisterRequest {
     pub username: String,
     pub password: String,
-    pub auth: Flow,
+    pub auth: AuthFlow,
 }
 
 #[cfg(test)]
 mod test {
     use super::RegisterRequest;
-    use super::Flow;
+    use super::AuthFlow;
     use crate::constants::AuthenticationType;
     use chrono::prelude::*;
     use openssl::base64::encode_block;
@@ -24,7 +24,7 @@ mod test {
         let registration = RegisterRequest {
             username: format!("test_bot_{}", utc_now),
             password: encode_block(&sha1(utc_now.as_bytes())),
-            auth: Flow {
+            auth: AuthFlow {
                 authentication_type: AuthenticationType::Password
             }
         };

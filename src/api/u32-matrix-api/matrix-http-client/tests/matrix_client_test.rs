@@ -5,7 +5,8 @@ use std::path::Path;
 use matrix_http_client::{MatrixClient, ApiUriBuilder, ClientConfig, AbsMatrixClient};
 use matrix_http_client::abstraction::GetError;
 use urlencoding::Encoded;
-use matrix_http_client::model::{RegisterRequest, Flow};
+use matrix_http_client::model::{RegisterRequest, AuthFlow};
+use matrix_http_client::constants::AuthenticationType;
 
 fn init_matrix_client() -> MatrixClient {
     use std::{thread, time};
@@ -116,8 +117,8 @@ async fn matrix_client_returns_200_on_successful_registration(){
     let registration = RegisterRequest {
         username: format!("test_bot_{}", utc_now),
         password: encode_block(&sha1(utc_now.as_bytes())),
-        auth: Flow {
-            authentication_type: flow.authentication_type
+        auth: AuthFlow {
+            authentication_type: AuthenticationType::Dummy //flow.authentication_type
         }
     };
 

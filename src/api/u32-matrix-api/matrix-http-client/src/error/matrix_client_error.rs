@@ -6,10 +6,13 @@ use crate::abstraction::GetError;
 
 #[derive(Debug)]
 pub enum MatrixClientError {
+    External(Box<dyn Error>),
     SendRequestError(SendRequestError),
     PayloadErr(PayloadError),
     JsonDeserializationError(serde_json::Error),
     HttpResponseError(HttpResponseError),
+    ContentTypeMissingError,
+    ContentTypeInvalidError(String),
     Unknown,
 }
 

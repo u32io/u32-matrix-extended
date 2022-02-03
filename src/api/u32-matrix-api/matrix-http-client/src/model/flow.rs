@@ -3,20 +3,20 @@ use crate::constants::AuthenticationType;
 
 // TODO: Rename `Flow` to something like `AuthenticationFlow`
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Flow {
+pub struct AuthFlow {
     #[serde(rename = "type")]
     pub authentication_type: AuthenticationType,
 }
 
 #[derive(Deserialize)]
-pub struct FlowCollection {
-    pub flows: Vec<Flow>,
+pub struct AuthFlowCollection {
+    pub flows: Vec<AuthFlow>,
 }
 
 #[cfg(test)]
 mod test {
     use super::AuthenticationType;
-    use super::Flow;
+    use super::AuthFlow;
 
     #[test]
     fn flow_deserializes_from_json() {
@@ -28,7 +28,7 @@ mod test {
         let flow = serde_json::from_str(&json);
         assert!(flow.is_ok());
 
-        let flow: Flow = flow.unwrap();
+        let flow: AuthFlow = flow.unwrap();
         assert_eq!(AuthenticationType::Password, flow.authentication_type);
     }
 }

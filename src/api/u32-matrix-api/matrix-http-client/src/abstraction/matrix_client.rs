@@ -1,11 +1,11 @@
 use std::pin::Pin;
 use std::future::Future;
-use crate::model::{FlowCollection, LoginRequest, LoginResponse, MessageRequest, EventResponse, RegisterRequest};
+use crate::model::{AuthFlowCollection, LoginRequest, LoginResponse, MessageRequest, EventResponse, RegisterRequest};
 use crate::MatrixClientError;
 use urlencoding::Encoded;
 
 pub trait AbsMatrixClient {
-    fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<FlowCollection,MatrixClientError>> + 'req>>;
+    fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<AuthFlowCollection,MatrixClientError>> + 'req>>;
 
     fn post_login<'req>(&'req self, req: &'req LoginRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>>;
 
