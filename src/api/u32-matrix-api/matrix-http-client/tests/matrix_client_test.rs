@@ -114,26 +114,15 @@ async fn matrix_client_returns_200_on_successful_registration(){
 
     let utc_now = Utc::now().timestamp().to_string();
 
-    let registration = RegisterRequest {
-        username: format!("test_bot_{}", utc_now),
-        password: encode_block(&sha1(utc_now.as_bytes())),
-        auth: AuthFlow {
-            authentication_type: AuthenticationType::Dummy //flow.authentication_type
-        }
-    };
+    let registration = RegisterRequest::new(format!("test_bot_{}", utc_now), encode_block(&sha1(utc_now.as_bytes())));
 
     println!("{:?}", registration);
 
     let resp = matrix.post_register(&registration).await;
 
-    if resp.is_err() {
-        println!("{:?}", resp.unwrap_err());
-    }
-    else {
-        assert!(resp.is_ok());
-        let resp = resp.unwrap();
-        assert!(!resp.access_token.is_empty());
-        assert!(!resp.home_server.is_empty());
-        assert!(resp.user_id.contains(&registration.username));
-    }
+    assert!(resp.is_ok());
+    let resp = resp.unwrap();
+    assert!(!resp.access_token.is_empty());
+    assert!(!resp.home_server.is_empty());
+    assert!(resp.user_id.contains(&registration.username));
 }
