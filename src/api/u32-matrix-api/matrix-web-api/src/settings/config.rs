@@ -1,13 +1,13 @@
-use matrix_web_security::Secret;
+use super::environment::EnvironmentName;
+use crate::constants::MatrixWebApi;
 use actix_web::http::Uri;
 use clap::{App, Arg};
+use matrix_http_client::ClientConfig;
+use matrix_web_security::Secret;
 use serde::de::DeserializeOwned;
 use std::fs::File;
 use std::io::BufReader;
 use uuid::Uuid;
-use super::environment::EnvironmentName;
-use crate::constants::MatrixWebApi;
-use matrix_http_client::ClientConfig;
 
 // TODO: Move ConstArg to a utility crate
 pub struct ConstArg {
@@ -20,11 +20,13 @@ pub struct ConstArg {
 
 impl ConstArg {
     pub(crate) fn get_short(&self) -> &'static str {
-        self.short.expect(&format!("Failed to unwrap {}", self.name))
+        self.short
+            .expect(&format!("Failed to unwrap {}", self.name))
     }
 
     pub(crate) fn get_value(&self) -> &'static str {
-        self.value.expect(&format!("Failed to unwrap {}", self.name))
+        self.value
+            .expect(&format!("Failed to unwrap {}", self.name))
     }
 }
 
@@ -154,8 +156,8 @@ impl Default for Config {
 
 impl Config {
     pub fn opts<F>(mut self, f: F) -> Self
-        where
-            F: Fn(&mut Self) -> (),
+    where
+        F: Fn(&mut Self) -> (),
     {
         f(&mut self);
         self

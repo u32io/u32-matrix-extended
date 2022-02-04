@@ -1,5 +1,5 @@
-use serde::{Serialize};
 use crate::model::AuthFlow;
+use serde::Serialize;
 
 /// `RegisterRequest` is a payload used for registering new users with Matrix Synapse.
 /// It contains a `username`, `password`, and `AuthFlow`, which must always be have an
@@ -17,16 +17,15 @@ impl RegisterRequest {
         Self {
             username,
             password,
-            auth: AuthFlow::dummy()
+            auth: AuthFlow::dummy(),
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::RegisterRequest;
     use super::AuthFlow;
-    use crate::constants::AuthenticationType;
+    use super::RegisterRequest;
     use chrono::prelude::*;
     use openssl::base64::encode_block;
     use openssl::sha::sha1;
@@ -38,7 +37,7 @@ mod test {
         let registration = RegisterRequest {
             username: format!("test_bot_{}", utc_now),
             password: encode_block(&sha1(utc_now.as_bytes())),
-            auth: AuthFlow::dummy()
+            auth: AuthFlow::dummy(),
         };
 
         let json = serde_json::to_string(&registration);

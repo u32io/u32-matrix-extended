@@ -1,4 +1,4 @@
 mod message;
 mod register;
 
-pub use register::RegisterService as RegisterService;
+pub use register::RegisterService;

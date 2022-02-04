@@ -1,12 +1,12 @@
 use actix_web::client::Client;
 use actix_web::http::StatusCode;
+use matrix_http_client::abstraction::GetError;
+use matrix_http_client::constants::AuthenticationType;
+use matrix_http_client::model::{AuthFlow, RegisterRequest};
+use matrix_http_client::{AbsMatrixClient, ApiUriBuilder, ClientConfig, MatrixClient};
 use std::convert::TryFrom;
 use std::path::Path;
-use matrix_http_client::{MatrixClient, ApiUriBuilder, ClientConfig, AbsMatrixClient};
-use matrix_http_client::abstraction::GetError;
 use urlencoding::Encoded;
-use matrix_http_client::model::{RegisterRequest, AuthFlow};
-use matrix_http_client::constants::AuthenticationType;
 
 fn init_matrix_client() -> MatrixClient {
     use std::{thread, time};
@@ -35,11 +35,12 @@ async fn matrix_client_returns_flow_on_successful_get_login() {
 }
 
 #[actix_rt::test]
-async fn matrix_client_returns_400_when_flow_is_invalid(){
+async fn matrix_client_returns_400_when_flow_is_invalid() {
     let matrix = init_matrix_client();
 
     let req = matrix_web_util::fs::read_file_as_unchecked(
-        "test_resource/model/login_request/invalid_flow.json");
+        "test_resource/model/login_request/invalid_flow.json",
+    );
 
     let resp = matrix.post_login(&req).await;
 
@@ -51,11 +52,12 @@ async fn matrix_client_returns_400_when_flow_is_invalid(){
 }
 
 #[actix_rt::test]
-async fn matrix_client_returns_403_when_credentials_are_invalid(){
+async fn matrix_client_returns_403_when_credentials_are_invalid() {
     let matrix = init_matrix_client();
 
     let req = matrix_web_util::fs::read_file_as_unchecked(
-        "test_resource/model/login_request/invalid_credential.json");
+        "test_resource/model/login_request/invalid_credential.json",
+    );
 
     let resp = matrix.post_login(&req).await;
 
@@ -67,18 +69,20 @@ async fn matrix_client_returns_403_when_credentials_are_invalid(){
 }
 
 #[actix_rt::test]
-async fn matrix_client_returns_200_after_valid_login_and_message_send(){
+async fn matrix_client_returns_200_after_valid_login_and_message_send() {
     let matrix = init_matrix_client();
     // To perform this test, we'll need a LoginRequest, a room id, and a message.
     // Get a valid login request
     let req = matrix_web_util::fs::read_file_as_unchecked(
-        "test_resource/model/login_request/.valid_credential.json");
+        "test_resource/model/login_request/.valid_credential.json",
+    );
     // Get a valid room id
-    let room_id: String = matrix_web_util::fs::read_file_as_unchecked(
-        "test_resource/misc/.room_id.json");
+    let room_id: String =
+        matrix_web_util::fs::read_file_as_unchecked("test_resource/misc/.room_id.json");
     // Get a valid message
     let msg = matrix_web_util::fs::read_file_as_unchecked(
-        "test_resource/model/message_request/hello.json");
+        "test_resource/model/message_request/hello.json",
+    );
     // Login
     let resp = matrix.post_login(&req).await;
     // Assert we have logged in successfully in order to proceed
@@ -87,17 +91,19 @@ async fn matrix_client_returns_200_after_valid_login_and_message_send(){
     let login_resp = resp.unwrap();
     // Send a message request using the above Message, room id, and the access token from the
     // LoginResponse
-    let msg_req = matrix.post_message(
-        &msg,
-        Encoded::new(room_id.as_str()),
-        login_resp.access_token.as_str())
+    let msg_req = matrix
+        .post_message(
+            &msg,
+            Encoded::new(room_id.as_str()),
+            login_resp.access_token.as_str(),
+        )
         .await;
 
     assert!(msg_req.is_ok());
 }
 
 #[actix_rt::test]
-async fn matrix_client_returns_200_on_successful_registration(){
+async fn matrix_client_returns_200_on_successful_registration() {
     use chrono::prelude::*;
     use openssl::base64::encode_block;
     use openssl::sha::sha1;
@@ -106,7 +112,10 @@ async fn matrix_client_returns_200_on_successful_registration(){
 
     let utc_now = Utc::now().timestamp().to_string();
 
-    let registration = RegisterRequest::new(format!("test_bot_{}", utc_now), encode_block(&sha1(utc_now.as_bytes())));
+    let registration = RegisterRequest::new(
+        format!("test_bot_{}", utc_now),
+        encode_block(&sha1(utc_now.as_bytes())),
+    );
 
     println!("{:?}", registration);
 

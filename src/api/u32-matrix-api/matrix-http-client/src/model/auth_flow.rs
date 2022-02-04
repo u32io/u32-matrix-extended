@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::constants::AuthenticationType;
+use serde::{Deserialize, Serialize};
 
 /// `AuthFlow` represents the [login flow](https://matrix.org/docs/spec/client_server/r0.6.1#get-matrix-client-r0-login)
 /// with is both sent to and received by Matrix Synapse.
@@ -12,7 +12,7 @@ pub struct AuthFlow {
 impl From<AuthenticationType> for AuthFlow {
     fn from(auth: AuthenticationType) -> Self {
         Self {
-            authentication_type: auth
+            authentication_type: auth,
         }
     }
 }
@@ -36,8 +36,8 @@ pub struct AuthFlowCollection {
 
 #[cfg(test)]
 mod test {
-    use super::AuthenticationType;
     use super::AuthFlow;
+    use super::AuthenticationType;
 
     #[test]
     fn flow_deserializes_from_json() {

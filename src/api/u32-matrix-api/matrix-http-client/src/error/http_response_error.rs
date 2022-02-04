@@ -1,15 +1,14 @@
-use actix_web::http::{StatusCode};
 use crate::model::ErrorResponse;
-use std::fmt::{Display, Formatter};
-use std::error::Error;
-use std::convert::TryFrom;
-use actix_web::client::ClientResponse;
-use actix_http::encoding::Decoder;
-use actix_http::{Payload, PayloadStream};
-use std::pin::Pin;
-use std::future::Future;
 use crate::MatrixClientError;
+use actix_http::encoding::Decoder;
 use actix_http::http::{header, HeaderValue};
+use actix_http::{Payload, PayloadStream};
+use actix_web::client::ClientResponse;
+use actix_web::http::StatusCode;
+use std::error::Error;
+use std::fmt::{Display, Formatter};
+use std::future::Future;
+use std::pin::Pin;
 
 // TODO: Provide a better name for this type
 #[derive(Debug)]

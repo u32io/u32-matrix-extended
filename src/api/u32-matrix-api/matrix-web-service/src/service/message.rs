@@ -4,4 +4,3 @@ use std::sync::Arc;
 pub struct MessageService {
     matrix_client: Arc<MatrixClient>,
 }
-

@@ -1,8 +1,8 @@
-use std::error::Error;
-use actix_web::client::{SendRequestError, PayloadError};
-use std::fmt::{Display, Formatter};
-use crate::error::HttpResponseError;
 use crate::abstraction::GetError;
+use crate::error::HttpResponseError;
+use actix_web::client::{PayloadError, SendRequestError};
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 
 // TODO: Reduce the number of variants in this type as it is growing.
 #[derive(Debug)]

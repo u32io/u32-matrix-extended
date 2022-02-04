@@ -1,22 +1,22 @@
 use super::constants::RoomEventType;
 use super::model::{
-    ErrorResponse, EventResponse, AuthFlowCollection, LoginRequest, LoginResponse, MessageRequest,
+    AuthFlowCollection, ErrorResponse, EventResponse, LoginRequest, LoginResponse, MessageRequest,
 };
 use super::ApiUriBuilder;
+use crate::error::{HttpResponseError, MatrixClientError};
+use crate::model::RegisterRequest;
+use crate::AbsMatrixClient;
+use actix_http::encoding::Decoder;
+use actix_http::http::{HeaderMap, HeaderValue, Uri};
 use actix_web::client::{Client, ClientResponse};
-use actix_web::http::{StatusCode, HeaderMap, HeaderValue};
-use urlencoding::Encoded;
+use actix_web::dev::{Payload, PayloadStream};
+use actix_web::http::header::CONTENT_TYPE;
+use actix_web::http::StatusCode;
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 use std::future::Future;
 use std::pin::Pin;
-use crate::AbsMatrixClient;
-use crate::error::{MatrixClientError, HttpResponseError};
-use crate::model::RegisterRequest;
-use actix_web::dev::{PayloadStream, Payload};
-use actix_http::encoding::Decoder;
-use serde::{Serialize, Deserialize};
-use actix_http::http::Uri;
-use serde::de::DeserializeOwned;
-use actix_web::http::header::CONTENT_TYPE;
+use urlencoding::Encoded;
 
 /// A template for building `GET` requests and mapping their `Err` to `MatrixClientErr`
 macro_rules! http_get {
@@ -76,18 +76,23 @@ impl MatrixClient {
             internal: InternalMatrixClient {
                 api_uri,
                 http_client,
-            }
+            },
         }
     }
 }
 
 impl AbsMatrixClient for MatrixClient {
     /// `GET` the authentication scheme of the matrix-synapse API
-    fn get_login<'req>(&'req self) -> Pin<Box<dyn Future<Output=Result<AuthFlowCollection,MatrixClientError>> + 'req>> {
+    fn get_login<'req>(
+        &'req self,
+    ) -> Pin<Box<dyn Future<Output = Result<AuthFlowCollection, MatrixClientError>> + 'req>> {
         Box::pin(self.internal.get_login())
     }
     /// `POST` the credentials of a user and expect a `200` response with an access token
-    fn post_login<'req>(&'req self, req: &'req LoginRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>> {
+    fn post_login<'req>(
+        &'req self,
+        req: &'req LoginRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<LoginResponse, MatrixClientError>> + 'req>> {
         Box::pin(self.internal.post_login(req))
     }
     /// `POST` a basic message and expect and expect a response that contains an event id
@@ -101,8 +106,8 @@ impl AbsMatrixClient for MatrixClient {
         &'req self,
         msg: &'req MessageRequest,
         room_id: Encoded<&'req str>,
-        access_token: &'req str
-    ) -> Pin<Box<dyn Future<Output=Result<EventResponse, MatrixClientError>> + 'req>> {
+        access_token: &'req str,
+    ) -> Pin<Box<dyn Future<Output = Result<EventResponse, MatrixClientError>> + 'req>> {
         Box::pin(self.internal.post_message(msg, room_id, access_token))
     }
     /// `POST` a registration payload and expect a `200` response with an access token
@@ -117,7 +122,10 @@ impl AbsMatrixClient for MatrixClient {
     ///     "user_id": "@example:localhost"
     /// }
     /// ```
-    fn post_register<'req>(&'req self, req: &'req RegisterRequest) -> Pin<Box<dyn Future<Output=Result<LoginResponse, MatrixClientError>> + 'req>> {
+    fn post_register<'req>(
+        &'req self,
+        req: &'req RegisterRequest,
+    ) -> Pin<Box<dyn Future<Output = Result<LoginResponse, MatrixClientError>> + 'req>> {
         Box::pin(self.internal.post_register(req))
     }
 }
@@ -160,14 +168,17 @@ impl InternalMatrixClient {
         try_convert_200!(response, EventResponse)
     }
 
-    async fn post_register<'req>(&'req self, req: &'req RegisterRequest) -> Result<LoginResponse, MatrixClientError> {
+    async fn post_register<'req>(
+        &'req self,
+        req: &'req RegisterRequest,
+    ) -> Result<LoginResponse, MatrixClientError> {
         let mut response = self.http_post(self.api_uri.register(), req).await?;
         match response.status() {
             StatusCode::OK | StatusCode::ACCEPTED => Self::get_json(response).await,
             _ => {
                 let error = HttpResponseError {
                     status: response.status(),
-                    body: Self::get_json(response).await?
+                    body: Self::get_json(response).await?,
                 };
 
                 Err(MatrixClientError::HttpResponseError(error))
@@ -175,44 +186,55 @@ impl InternalMatrixClient {
         }
     }
 
-    async fn http_get(&self, uri: &str) -> Result<ClientResponse<Decoder<Payload<PayloadStream>>>, MatrixClientError> {
+    async fn http_get(
+        &self,
+        uri: &str,
+    ) -> Result<ClientResponse<Decoder<Payload<PayloadStream>>>, MatrixClientError> {
         self.http_client
             .get(uri)
             .send()
             .await
-            .map_err(|e|MatrixClientError::SendRequestError(e))
+            .map_err(|e| MatrixClientError::SendRequestError(e))
     }
 
-    async fn http_post<T: Serialize>(&self, uri: Uri, model: &T) -> Result<ClientResponse<Decoder<Payload<PayloadStream>>>, MatrixClientError> {
+    async fn http_post<T: Serialize>(
+        &self,
+        uri: Uri,
+        model: &T,
+    ) -> Result<ClientResponse<Decoder<Payload<PayloadStream>>>, MatrixClientError> {
         self.http_client
             .post(uri)
             .send_json(model)
             .await
-            .map_err(|e|MatrixClientError::SendRequestError(e))
+            .map_err(|e| MatrixClientError::SendRequestError(e))
     }
 
     // TODO: Rename this method and possibly move it to a utility class
-    async fn get_json<T: DeserializeOwned>(mut response: ClientResponse<Decoder<Payload<PayloadStream>>>) -> Result<T, MatrixClientError> {
-        use actix_web::http::{HeaderMap, HeaderName, HeaderValue};
-
+    async fn get_json<T: DeserializeOwned>(
+        mut response: ClientResponse<Decoder<Payload<PayloadStream>>>,
+    ) -> Result<T, MatrixClientError> {
         let headers: &HeaderMap = response.headers();
 
-        let content_type = headers.get(CONTENT_TYPE)
+        let content_type = headers
+            .get(CONTENT_TYPE)
             .ok_or(MatrixClientError::ContentTypeMissingError)?;
 
         if !content_type.eq(&HeaderValue::from_static("application/json")) {
-            return Err(MatrixClientError::ContentTypeInvalidError(content_type.to_str()
-                .unwrap_or("Failed up unwrap Content-Type value")
-                .to_string()))
+            return Err(MatrixClientError::ContentTypeInvalidError(
+                content_type
+                    .to_str()
+                    .unwrap_or("Failed up unwrap Content-Type value")
+                    .to_string(),
+            ));
         }
-        
-        let bytes = response.body()
+
+        let bytes = response
+            .body()
             .await
             .map_err(|e| MatrixClientError::PayloadErr(e))?;
 
         println!("{}", String::from_utf8_lossy(bytes.as_ref()));
 
-        serde_json::from_slice(&*bytes)
-            .map_err(|e|MatrixClientError::JsonDeserializationError(e))
+        serde_json::from_slice(&*bytes).map_err(|e| MatrixClientError::JsonDeserializationError(e))
     }
 }

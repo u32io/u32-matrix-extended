@@ -1,5 +1,5 @@
-mod matrix_client;
 mod get_err;
+mod matrix_client;
 
-pub use get_err::GetError as GetError;
-pub use matrix_client::AbsMatrixClient as AbsMatrixClient;
+pub use get_err::GetError;
+pub use matrix_client::AbsMatrixClient;
