@@ -5,6 +5,7 @@ members = [
     "matrix-http-client",
     "matrix-web-dto",
     "matrix-web-entity",
+    "matrix-web-model",
     "matrix-web-dao",
     "matrix-web-service",
     "matrix-web-security",
