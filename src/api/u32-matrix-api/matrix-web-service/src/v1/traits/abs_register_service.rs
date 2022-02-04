@@ -1,4 +1,3 @@
-use crate::service::RegisterService;
 use matrix_http_client::MatrixClient;
 use std::future::Future;
 use std::pin::Pin;

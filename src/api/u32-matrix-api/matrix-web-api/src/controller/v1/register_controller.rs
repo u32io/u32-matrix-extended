@@ -1,7 +1,7 @@
 use actix_web::web::{Data, Json};
 use actix_web::{post, web, Responder};
 use matrix_web_dto::v1::user::RegisterUserDTO;
-use matrix_web_service::traits::AbsRegisterService;
+use matrix_web_service::v1::AbsRegisterService;
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(post_register);

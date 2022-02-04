@@ -1,4 +1,4 @@
-use crate::traits::AbsRegisterService;
+use crate::v1::AbsRegisterService;
 use matrix_http_client::{AbsMatrixClient, MatrixClient};
 use std::future::Future;
 use std::pin::Pin;
