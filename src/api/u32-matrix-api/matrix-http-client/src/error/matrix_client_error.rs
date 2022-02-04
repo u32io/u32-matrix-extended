@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter};
 use crate::error::HttpResponseError;
 use crate::abstraction::GetError;
 
+// TODO: Reduce the number of variants in this type as it is growing.
 #[derive(Debug)]
 pub enum MatrixClientError {
     External(Box<dyn Error>),

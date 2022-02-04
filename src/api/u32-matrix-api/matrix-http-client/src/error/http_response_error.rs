@@ -11,6 +11,7 @@ use std::future::Future;
 use crate::MatrixClientError;
 use actix_http::http::{header, HeaderValue};
 
+// TODO: Provide a better name for this type
 #[derive(Debug)]
 pub struct HttpResponseError {
     pub(crate) status: StatusCode,

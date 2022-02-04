@@ -104,14 +104,6 @@ async fn matrix_client_returns_200_on_successful_registration(){
 
     let matrix = init_matrix_client();
 
-    let flow = matrix.get_login()
-        .await
-        .expect("Failed to retrieve AuthenticationFlow collection")
-        .flows
-        .into_iter()
-        .next()
-        .expect("AuthenticationFlow collection is empty");
-
     let utc_now = Utc::now().timestamp().to_string();
 
     let registration = RegisterRequest::new(format!("test_bot_{}", utc_now), encode_block(&sha1(utc_now.as_bytes())));
