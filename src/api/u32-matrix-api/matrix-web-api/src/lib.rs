@@ -1,4 +1,3 @@
-mod model;
 mod web;
 
 pub mod constants;

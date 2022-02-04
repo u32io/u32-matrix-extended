@@ -1,13 +1,8 @@
 use super::environment::EnvironmentName;
 use crate::constants::MatrixWebApi;
 use actix_web::http::Uri;
-use clap::{App, Arg};
 use matrix_http_client::ClientConfig;
 use matrix_web_security::Secret;
-use serde::de::DeserializeOwned;
-use std::fs::File;
-use std::io::BufReader;
-use uuid::Uuid;
 
 // TODO: Move ConstArg to a utility crate
 pub struct ConstArg {

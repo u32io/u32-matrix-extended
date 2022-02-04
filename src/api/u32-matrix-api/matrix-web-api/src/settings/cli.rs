@@ -4,7 +4,6 @@ use crate::settings::config::ConfigConstants;
 use crate::settings::ConstArg;
 use clap::{App, Arg};
 use matrix_web_security::Secret;
-use std::rc::Rc;
 
 impl From<ConstArg> for Arg<'static, 'static> {
     fn from(src: ConstArg) -> Self {
