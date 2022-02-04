@@ -23,3 +23,9 @@ impl From<RegisterRequest> for User {
         }
     }
 }
+
+impl From<User> for RegisterRequest {
+    fn from(src: User) -> Self {
+        Self::new(src.username, src.password.unwrap())
+    }
+}

@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 matrix-http-client = { path = "../matrix-http-client" }
 matrix-web-model = { path = "../matrix-web-model" }
+matrix-web-dto = { path = "../matrix-web-dto" }
